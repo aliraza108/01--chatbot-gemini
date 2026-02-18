@@ -26,7 +26,17 @@ set_tracing_disabled(True)
 # FASTAPI APP
 # -------------------------
 app = FastAPI(title="Chatbot")
+origins = [
+    "https://01-chatbot.vercel.app",
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # -------------------------
 # REQUEST / RESPONSE MODELS
 # -------------------------
