@@ -1,5 +1,6 @@
 import asyncio
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict
 
@@ -11,7 +12,7 @@ from openai.types.responses import ResponseTextDeltaEvent
 # CONFIG
 # -------------------------
 API_KEY = "AIzaSyDjoJxy-MX9PDxTKgaBKUeKTCPHsodAXF8"
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-2.0-flash"
 
 client = AsyncOpenAI(
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
@@ -26,6 +27,10 @@ set_tracing_disabled(True)
 # FASTAPI APP
 # -------------------------
 app = FastAPI(title="Chatbot")
+
+# -------------------------
+# CORS CONFIGURATION
+# -------------------------
 origins = [
     "https://01-chatbot.vercel.app",
 ]
@@ -37,6 +42,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 # -------------------------
 # REQUEST / RESPONSE MODELS
 # -------------------------
@@ -73,22 +79,18 @@ Always summarize the conversation when asked.
 async def run_chat_agent(user_message: str):
     global chat_summary
 
-    # Append user message
     chat_history.append({"role": "user", "content": user_message})
 
-    # Run agent and stream response
     result = Runner.run_streamed(chat_agent, input=chat_history)
     full_response = ""
 
     async for event in result.stream_events():
         if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
-            delta = event.data.delta
-            full_response += delta
+            full_response += event.data.delta
 
-    # Append assistant response
     chat_history.append({"role": "assistant", "content": full_response})
 
-    # Generate updated summary
+    # Update summary
     summary_prompt = f"""
 Conversation:
 {chat_history}
@@ -117,7 +119,3 @@ async def reset_chat():
     chat_history = []
     chat_summary = ""
     return {"status": "reset complete"}
-
-@app.get("/")
-async def getpage():
-    return "working fine page"
