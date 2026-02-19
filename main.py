@@ -37,6 +37,7 @@ app = FastAPI(title="Chatbot")
 # -------------------------
 origins = [
     "https://01-chatbot.vercel.app",
+    *
 ]
 
 app.add_middleware(
