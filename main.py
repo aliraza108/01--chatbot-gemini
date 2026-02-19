@@ -18,7 +18,7 @@ if not API_KEY:
     print("❌ API_KEY missing")
     raise ValueError("API_KEY environment variable not set")
 
-MODEL = "gemini-2.0-flash"
+MODEL = "gemini-2.5-flash"
 
 client = AsyncOpenAI(
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
