@@ -1,3 +1,4 @@
+import os
 import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,7 +12,10 @@ from openai.types.responses import ResponseTextDeltaEvent
 # -------------------------
 # CONFIG
 # -------------------------
-API_KEY = "AIzaSyDjoJxy-MX9PDxTKgaBKUeKTCPHsodAXF8"
+API_KEY = os.environ.get("API_KEY")
+
+if not API_KEY:
+    raise ValueError("API_KEY environment variable not set")
 MODEL = "gemini-2.0-flash"
 
 client = AsyncOpenAI(
